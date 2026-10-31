@@ -1,529 +1,285 @@
+Tampilan pratinjau (*preview*) web aplikasi kalkulator logistik yang baru sudah langsung saya buatkan dan tampilkan secara interaktif di layar Anda.
+
+Silakan periksa kotak **Canvas/Pratinjau Web** di layar untuk langsung mencoba fiturnya:
+
+* **Tombol Tambah Koli** kini berada di bagian paling bawah daftar barang.
+* **Fitur History (Maksimal 10)** siap mencatat otomatis setiap kali Anda memencet tombol "Salin WA".
+* Ringkasan berat timbangan dan berat volumetrik sudah **bersih dan dihapus penuh**.
+
+Jika jendela pratinjau di layar Anda belum muncul atau ingin memperbarui kodenya, berikut adalah kode HTML lengkapnya untuk disalin:
+
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Kalkulator Ekspedisi Logistik CS - Khusus Darat</title>
-    <!-- Mobile & PWA Compatibility Tags for iOS & Android -->
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiCalc Darat Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="LogiCalc CS">
-    <meta name="theme-color" content="#4338ca">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2821/2821810.png">
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Family Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="apple-mobile-web-app-title" content="LogiCalc">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/truck.png">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        ::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12 antialiased">
 
-    <!-- Header Navigation -->
-    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-md">
-                    <i class="fa-solid fa-truck text-2xl text-amber-300"></i>
+                <div class="bg-white/15 p-2 rounded-xl backdrop-blur-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold leading-tight">LogiCalc Darat Pro</h1>
-                    <p class="text-xs text-indigo-200">Kalkulator Timbangan, Volume & Tagihan Pengiriman Darat</p>
+                    <h1 class="font-bold text-base leading-tight">LogiCalc Darat Pro</h1>
+                    <p class="text-[11px] text-blue-100">Kalkulator Pengiriman Darat</p>
                 </div>
             </div>
-            <button onclick="resetAllItems()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-3.5 rounded-lg transition duration-200 flex items-center gap-1.5 shadow-sm border border-indigo-400/30">
-                <i class="fa-solid fa-rotate-right"></i>
-                <span class="hidden sm:inline">Reset Semua</span>
-            </button>
+            <button onclick="resetAll()" class="text-xs bg-rose-500 hover:bg-rose-600 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm">Reset</button>
         </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow">
+    <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
         
-        <!-- Input Tarif / Harga per Kg Global Banner -->
-        <section class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white rounded-2xl p-4 sm:p-5 mb-6 shadow-md border border-indigo-700/50">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-amber-400 text-indigo-950 p-3 rounded-xl shadow-inner font-extrabold">
-                        <i class="fa-solid fa-tag text-xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Tarif Pengiriman Darat</h2>
-                        <p class="text-xs text-indigo-200 mt-0.5">Masukkan tarif per kg untuk menghitung total biaya pengiriman secara otomatis.</p>
-                    </div>
+        <!-- Setting Tarif & PPN -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tarif Pengiriman Darat</label>
+                <span class="text-[11px] text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full font-semibold">Khusus Darat (: 4000)</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-semibold text-sm">Rp</span>
+                    <input type="number" id="price_per_kg" placeholder="0" oninput="calculate()" class="w-full pl-10 pr-12 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none font-bold text-slate-800 text-sm">
+                    <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs text-slate-400 font-medium">/ kg</span>
                 </div>
-                <div class="w-full sm:w-auto flex flex-wrap items-center gap-3">
-                    <div class="flex items-center gap-2 bg-indigo-950/60 p-2 rounded-xl border border-indigo-500/30">
-                        <span class="text-xs font-bold text-amber-300 pl-2">Rp / Kg:</span>
-                        <input type="number" id="price_per_kg" min="0" placeholder="0" oninput="calculateAll()" 
-                            class="w-32 sm:w-36 text-sm font-extrabold text-slate-900 bg-white border-0 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-inner">
-                    </div>
-
-                    <!-- PPN Option Toggle -->
-                    <label class="flex items-center gap-2 bg-indigo-950/60 hover:bg-indigo-950/80 p-2.5 rounded-xl border border-indigo-500/30 cursor-pointer select-none transition">
-                        <input type="checkbox" id="ppn_toggle" onchange="calculateAll()" class="w-4 h-4 text-amber-400 bg-gray-100 border-gray-300 rounded focus:ring-amber-400 accent-amber-400 cursor-pointer">
-                        <span class="text-xs font-bold text-amber-300">Gunakan PPN (× 1.1)</span>
-                    </label>
+                <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl">
+                    <input type="checkbox" id="use_ppn" onchange="calculate()" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                    <label for="use_ppn" class="text-xs font-semibold text-slate-700 cursor-pointer select-none">Gunakan PPN (× 1,1)</label>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Main Workspace: Left Input Form / Right Summary -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Daftar Barang -->
+        <div class="space-y-3">
+            <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Daftar Kiriman Barang</h2>
             
-            <!-- LEFT COLUMN: Item Input Forms (7 Cols on LG) -->
-            <div class="lg:col-span-7 flex flex-col gap-4">
-                
-                <div class="flex items-center justify-between px-1">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                        <i class="fa-solid fa-boxes-packing text-indigo-600"></i>
-                        Daftar Barang / Koli Kiriman
-                    </h3>
-                    <button onclick="addNewItem()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-3.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95">
-                        <i class="fa-solid fa-plus text-xs"></i>
-                        <span>Tambah Barang</span>
-                    </button>
-                </div>
+            <div id="items_container" class="space-y-3"></div>
 
-                <!-- Container where Dynamic Item Cards are rendered -->
-                <div id="items_container" class="space-y-4">
-                    <!-- Dynamic Items render here via JS -->
-                </div>
+            <!-- Tombol Tambah Barang di Posisi Bawah -->
+            <button onclick="addItem()" class="w-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 text-xs font-bold py-3 px-4 rounded-2xl transition flex items-center justify-center space-x-2 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                <span>Tambah Koli / Barang Baru</span>
+            </button>
+        </div>
 
+        <!-- Ringkasan Hasil -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-5 space-y-1">
+                <span class="text-xs font-semibold text-emerald-100 uppercase tracking-wider block">Total Tagihan <span id="ppn_badge_label">(Sebelum PPN)</span></span>
+                <div id="res_grand_total" class="text-3xl font-black tracking-tight">Rp 0</div>
+                <p id="ppn_subtext" class="text-[11px] text-emerald-100 font-medium">Berdasarkan tarif per kg &amp; berat ditagihkan</p>
             </div>
 
-            <!-- RIGHT COLUMN: Summary & Result Decision (5 Cols on LG) -->
-            <div class="lg:col-span-5">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sticky top-20">
-                    <div class="border-b border-slate-100 pb-4 mb-4 flex items-center justify-between">
-                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-receipt text-indigo-600"></i>
-                            Rincian Tagihan CS
-                        </h3>
-                        <span class="text-xs font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-100" id="total_koli_badge">0 Koli</span>
+            <div class="p-4 space-y-3">
+                <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Berat Ditagihkan (Chargeable)</span>
+                        <p class="text-[11px] text-slate-400">Dasar perhitungan utama</p>
                     </div>
+                    <div id="res_chargeable" class="text-xl font-extrabold text-blue-600">0.00 Kg</div>
+                </div>
 
-                    <!-- Hero Card: Total Tagihan Rp -->
-                    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-2xl p-4 sm:p-5 mb-5 shadow-md relative overflow-hidden">
-                        <div class="absolute -right-4 -bottom-4 opacity-10 text-white">
-                            <i class="fa-solid fa-money-bill-wave text-8xl"></i>
-                        </div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-100 block mb-1" id="total_bill_label">Total Tagihan Pelanggan</span>
-                        <div class="flex items-baseline gap-1 my-1">
-                            <span id="total_bill_display" class="text-3xl sm:text-4xl font-extrabold tracking-tight">Rp 0</span>
-                        </div>
-                        <p class="text-[11px] text-emerald-100 mt-1 flex items-center gap-1.5" id="ppn_status_subtext">
-                            <i class="fa-solid fa-calculator"></i>
-                            <span>Chargeable Weight × Harga / Kg</span>
-                        </p>
+                <div class="space-y-2 pt-1 px-1">
+                    <div id="subtotal_row" class="flex justify-between items-center text-xs text-slate-600">
+                        <span>Subtotal Sebelum PPN:</span>
+                        <span id="res_subtotal" class="font-bold text-slate-800">Rp 0</span>
                     </div>
-
-                    <!-- Recommendation / Final Chargeable Weight Display -->
-                    <div id="decision_card" class="rounded-xl p-4 mb-5 border transition-all duration-300 bg-slate-50 border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Berat Ditagihkan (Chargeable)</span>
-                            <span id="decision_tag" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">Belum Ada Data</span>
-                        </div>
-                        <div class="flex items-baseline gap-2 my-1">
-                            <span id="final_weight_display" class="text-3xl font-extrabold text-slate-800">0.00</span>
-                            <span class="text-sm font-bold text-slate-500">Kg</span>
-                        </div>
-                        <p id="decision_desc" class="text-xs text-slate-600 mt-2 leading-relaxed">
-                            Masukkan rincian barang dan tarif per kg untuk menghitung total tagihan pengiriman.
-                        </p>
-                    </div>
-
-                    <!-- Detailed Comparisons Table -->
-                    <div class="space-y-3 text-xs mb-6">
-                        <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-600 flex items-center gap-2">
-                                <i class="fa-solid fa-weight-hanging text-indigo-500"></i>
-                                Total Berat Timbangan
-                            </span>
-                            <span id="total_actual_weight" class="font-bold text-slate-800 text-sm">0.00 Kg</span>
-                        </div>
-
-                        <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-600 flex items-center gap-2">
-                                <i class="fa-solid fa-cube text-amber-500"></i>
-                                Total Berat Volumetrik (Darat)
-                            </span>
-                            <span id="total_volumetric_weight" class="font-bold text-slate-800 text-sm">0.00 Kg</span>
-                        </div>
-
-                        <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
-                            <span class="text-slate-600 flex items-center gap-2">
-                                <i class="fa-solid fa-money-check-dollar text-emerald-600"></i>
-                                Subtotal Sebelum PPN
-                            </span>
-                            <span id="subtotal_bill_display" class="font-bold text-slate-800 text-sm">Rp 0</span>
-                        </div>
-
-                        <div id="ppn_row_display" class="hidden justify-between items-center p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900">
-                            <span class="flex items-center gap-2 font-medium">
-                                <i class="fa-solid fa-percent text-amber-600"></i>
-                                Tambahan PPN (× 1.1)
-                            </span>
-                            <span id="ppn_amount_display" class="font-bold text-sm">Rp 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="space-y-2">
-                        <button onclick="copySummaryText()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 px-4 rounded-xl text-xs transition duration-200 flex items-center justify-center gap-2 shadow-md active:scale-[0.98]">
-                            <i class="fa-regular fa-copy text-sm"></i>
-                            <span>Salin Rincian Tagihan ke WA</span>
-                        </button>
+                    <div id="ppn_row" class="flex justify-between items-center text-xs text-slate-600 hidden">
+                        <span>Tambahan PPN (× 1,1):</span>
+                        <span id="res_ppn" class="font-bold text-emerald-600">Rp 0</span>
                     </div>
                 </div>
+
+                <button onclick="saveAndCopyWA()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white text-xs font-bold py-3.5 px-4 rounded-xl transition shadow-sm flex items-center justify-center space-x-2 mt-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    <span>Salin Rincian Tagihan ke WA</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- History (Maksimal 10 Data) -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1.5">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Riwayat Perhitungan (Max 10)</span>
+                </h3>
+                <button onclick="clearHistory()" class="text-[11px] text-slate-400 hover:text-rose-500 font-medium transition">Hapus Riwayat</button>
             </div>
 
+            <div id="history_list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
         </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-4 mt-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            &copy; 2026 LogiCalc Darat Pro - Alat Bantu Customer Service Logistik Ekspedisi Darat.
-        </div>
-    </footer>
-
-    <!-- Toast Notification for Copy Alert -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
-        <span id="toast_msg">Ringkasan berhasil disalin!</span>
-    </div>
-
-    <!-- JavaScript Application Logic -->
     <script>
-        let items = [];
-        let nextItemId = 1;
-        const DIVISOR = 4000;
-
-        const rupiahFormat = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            maximumFractionDigits: 0
-        });
-
-        window.onload = function() {
-            addNewItem();
-        };
-
-        function addNewItem() {
-            const itemId = nextItemId++;
-            const itemData = {
-                id: itemId,
-                name: `Barang / Dus #${items.length + 1}`,
-                qty: 1,
-                weight: 30, // Default berat per koli set to 30 kg
-                length: 0,
-                width: 0,
-                height: 0
-            };
-            
-            items.push(itemData);
-            renderItems();
-            calculateAll();
-        }
-
-        function removeItem(id) {
-            if (items.length <= 1) {
-                showToast("Minimal harus ada 1 barang dalam daftar.");
-                return;
-            }
-            items = items.filter(item => item.id !== id);
-            renderItems();
-            calculateAll();
-        }
+        let items = [{ id: 1, qty: 1, weight: 30, length: 40, width: 40, height: 40 }];
+        let historyData = JSON.parse(localStorage.getItem('logicalc_history') || '[]');
 
         function renderItems() {
             const container = document.getElementById('items_container');
             container.innerHTML = '';
-
             items.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 relative transition hover:border-indigo-300";
-                
-                card.innerHTML = `
-                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
-                        <div class="flex items-center gap-2 w-2/3">
-                            <i class="fa-solid fa-box text-indigo-600 text-xs"></i>
-                            <input type="text" value="${item.name}" onchange="updateItemName(${item.id}, this.value)" 
-                                class="font-bold text-xs text-slate-800 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 rounded px-2 py-1 w-full transition border border-transparent hover:border-slate-200" placeholder="Nama Barang / Keterangan">
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg border border-indigo-100">Item #${index + 1}</span>
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3 relative">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                            <span class="text-xs font-bold text-blue-600">Koli #${index + 1}</span>
                             ${items.length > 1 ? `
-                                <button onclick="removeItem(${item.id})" class="text-slate-400 hover:text-red-500 text-xs p-1.5 rounded-lg transition hover:bg-red-50" title="Hapus Barang">
-                                    <i class="fa-solid fa-trash-can"></i>
+                                <button onclick="removeItem(${item.id})" class="text-xs text-rose-500 hover:text-rose-700 font-medium flex items-center space-x-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <span>Hapus</span>
                                 </button>
                             ` : ''}
                         </div>
-                    </div>
-
-                    <!-- Dimension & Weight Grid Inputs -->
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                        <!-- Jumlah Koli -->
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Jumlah Koli</label>
-                            <input type="number" min="1" value="${item.qty || ''}" oninput="updateItemVal(${item.id}, 'qty', this.value)" placeholder="Qty" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 bg-slate-50 focus:bg-white font-bold text-indigo-700">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[11px] font-semibold text-slate-500 block mb-1">Jumlah Koli</label>
+                                <input type="number" min="1" value="${item.qty}" oninput="updateItem(${item.id}, 'qty', this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-slate-700 text-xs">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-slate-500 block mb-1">Berat per Koli (Kg)</label>
+                                <input type="number" min="0" value="${item.weight}" oninput="updateItem(${item.id}, 'weight', this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-slate-700 text-xs">
+                            </div>
                         </div>
-
-                        <!-- Berat per Koli (Default 30 kg) -->
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Berat per Koli (kg)</label>
-                            <input type="number" step="0.01" min="0" value="${item.weight !== undefined ? item.weight : 30}" oninput="updateItemVal(${item.id}, 'weight', this.value)" placeholder="Kg/koli" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 bg-slate-50 focus:bg-white font-semibold text-indigo-900">
-                        </div>
-
-                        <!-- Panjang -->
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Panjang (cm)</label>
-                            <input type="number" min="0" value="${item.length || ''}" oninput="updateItemVal(${item.id}, 'length', this.value)" placeholder="P" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 bg-slate-50 focus:bg-white font-medium">
-                        </div>
-
-                        <!-- Lebar -->
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Lebar (cm)</label>
-                            <input type="number" min="0" value="${item.width || ''}" oninput="updateItemVal(${item.id}, 'width', this.value)" placeholder="L" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 bg-slate-50 focus:bg-white font-medium">
-                        </div>
-
-                        <!-- Tinggi -->
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tinggi (cm)</label>
-                            <input type="number" min="0" value="${item.height || ''}" oninput="updateItemVal(${item.id}, 'height', this.value)" placeholder="T" class="w-full text-xs border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 bg-slate-50 focus:bg-white font-medium">
+                            <label class="text-[11px] font-semibold text-slate-500 block mb-1">Dimensi per Koli (P × L × T cm)</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="number" min="0" placeholder="P (cm)" value="${item.length}" oninput="updateItem(${item.id}, 'length', this.value)" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs font-semibold text-center text-slate-700">
+                                <input type="number" min="0" placeholder="L (cm)" value="${item.width}" oninput="updateItem(${item.id}, 'width', this.value)" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs font-semibold text-center text-slate-700">
+                                <input type="number" min="0" placeholder="T (cm)" value="${item.height}" oninput="updateItem(${item.id}, 'height', this.value)" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-xs font-semibold text-center text-slate-700">
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Individual Subtotal Banner & Comparison -->
-                    <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap justify-between items-center text-[11px] text-slate-600 gap-2 bg-slate-50/70 p-2.5 rounded-xl">
-                        <div>
-                            <span>Aktual: </span>
-                            <span class="font-bold text-slate-800" id="sub_act_${item.id}">0.00 Kg</span>
-                        </div>
-                        <div>
-                            <span>Volumetrik: </span>
-                            <span class="font-bold text-slate-800" id="sub_vol_${item.id}">0.00 Kg</span>
-                        </div>
-                        <div>
-                            <span>Chargeable: </span>
-                            <span class="font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded" id="sub_charge_${item.id}">0.00 Kg</span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
+                `);
             });
+            calculate();
         }
 
-        function updateItemVal(id, field, value) {
+        function addItem() {
+            const newId = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+            items.push({ id: newId, qty: 1, weight: 30, length: 40, width: 40, height: 40 });
+            renderItems();
+        }
+
+        function removeItem(id) {
+            items = items.filter(i => i.id !== id);
+            renderItems();
+        }
+
+        function updateItem(id, field, value) {
             const item = items.find(i => i.id === id);
-            if (item) {
-                item[field] = parseFloat(value) || 0;
-                calculateAll();
-            }
+            if (item) { item[field] = parseFloat(value) || 0; calculate(); }
         }
 
-        function updateItemName(id, value) {
-            const item = items.find(i => i.id === id);
-            if (item) {
-                item.name = value || "Barang";
-            }
-        }
-
-        function calculateAll() {
-            let totalQty = 0;
-            let totalActualWeight = 0;
-            let totalVolumetricWeight = 0;
-            let totalChargeableWeight = 0;
-
+        function calculate() {
             const pricePerKg = parseFloat(document.getElementById('price_per_kg').value) || 0;
-            const usePPN = document.getElementById('ppn_toggle').checked;
+            const usePpn = document.getElementById('use_ppn').checked;
+            let totalChargeable = 0;
 
             items.forEach(item => {
-                const qty = item.qty > 0 ? item.qty : 1;
-                const weightPerKoli = item.weight || 0;
-                const p = item.length || 0;
-                const l = item.width || 0;
-                const t = item.height || 0;
-
-                const itemActualWeight = qty * weightPerKoli;
-                const singleVolumeCm3 = p * l * t;
-                const itemVolumetricWeight = (singleVolumeCm3 / DIVISOR) * qty;
-                const itemChargeable = Math.max(itemActualWeight, itemVolumetricWeight);
-
-                totalQty += qty;
-                totalActualWeight += itemActualWeight;
-                totalVolumetricWeight += itemVolumetricWeight;
-                totalChargeableWeight += itemChargeable;
-
-                const subActEl = document.getElementById(`sub_act_${item.id}`);
-                const subVolEl = document.getElementById(`sub_vol_${item.id}`);
-                const subChargeEl = document.getElementById(`sub_charge_${item.id}`);
-
-                if (subActEl) subActEl.innerText = `${itemActualWeight.toFixed(2)} Kg`;
-                if (subVolEl) subVolEl.innerText = `${itemVolumetricWeight.toFixed(2)} Kg`;
-                if (subChargeEl) subChargeEl.innerText = `${itemChargeable.toFixed(2)} Kg`;
+                const qty = item.qty || 0;
+                const actualW = (item.weight || 0) * qty;
+                const volW = ((item.length || 0) * (item.width || 0) * (item.height || 0) / 4000) * qty;
+                totalChargeable += Math.max(actualW, volW);
             });
 
-            const subtotalBill = totalChargeableWeight * pricePerKg;
-            const finalBill = usePPN ? subtotalBill * 1.1 : subtotalBill;
-            const ppnAmount = usePPN ? finalBill - subtotalBill : 0;
+            const subtotal = totalChargeable * pricePerKg;
+            const grandTotal = usePpn ? subtotal * 1.1 : subtotal;
 
-            document.getElementById('total_koli_badge').innerText = `${totalQty} Koli`;
-            document.getElementById('total_actual_weight').innerText = `${totalActualWeight.toFixed(2)} Kg`;
-            document.getElementById('total_volumetric_weight').innerText = `${totalVolumetricWeight.toFixed(2)} Kg`;
-            document.getElementById('subtotal_bill_display').innerText = rupiahFormat.format(subtotalBill);
-            document.getElementById('total_bill_display').innerText = rupiahFormat.format(finalBill);
+            document.getElementById('res_chargeable').innerText = totalChargeable.toFixed(2) + ' Kg';
+            document.getElementById('res_subtotal').innerText = 'Rp ' + Math.round(subtotal).toLocaleString('id-ID');
+            document.getElementById('res_ppn').innerText = 'Rp ' + Math.round(grandTotal - subtotal).toLocaleString('id-ID');
+            document.getElementById('res_grand_total').innerText = 'Rp ' + Math.round(grandTotal).toLocaleString('id-ID');
 
-            const ppnRow = document.getElementById('ppn_row_display');
-            const ppnAmountDisplay = document.getElementById('ppn_amount_display');
-            const ppnStatusSubtext = document.getElementById('ppn_status_subtext');
-            const totalBillLabel = document.getElementById('total_bill_label');
+            document.getElementById('ppn_row').classList.toggle('hidden', !usePpn);
+            document.getElementById('ppn_badge_label').innerText = usePpn ? '(Termasuk 10% PPN)' : '(Sebelum PPN)';
+            document.getElementById('ppn_subtext').innerText = usePpn ? 'Termasuk PPN 1.1× dari total biaya' : 'Berdasarkan tarif per kg & berat ditagihkan';
+        }
 
-            if (usePPN) {
-                ppnRow.classList.remove('hidden');
-                ppnRow.classList.add('flex');
-                ppnAmountDisplay.innerText = rupiahFormat.format(ppnAmount);
-                totalBillLabel.innerText = "Total Tagihan (Termasuk PPN)";
-                ppnStatusSubtext.innerHTML = `<i class="fa-solid fa-receipt"></i> <span>(Subtotal × 1.1 PPN)</span>`;
-            } else {
-                ppnRow.classList.remove('flex');
-                ppnRow.classList.add('hidden');
-                totalBillLabel.innerText = "Total Tagihan Pelanggan";
-                ppnStatusSubtext.innerHTML = `<i class="fa-solid fa-calculator"></i> <span>Chargeable Weight × Harga / Kg</span>`;
+        function resetAll() {
+            items = [{ id: 1, qty: 1, weight: 30, length: 40, width: 40, height: 40 }];
+            document.getElementById('price_per_kg').value = '';
+            document.getElementById('use_ppn').checked = false;
+            renderItems();
+        }
+
+        function saveAndCopyWA() {
+            const pricePerKg = parseFloat(document.getElementById('price_per_kg').value) || 0;
+            const usePpn = document.getElementById('use_ppn').checked;
+            let totalChargeable = 0;
+            let detailText = '';
+
+            items.forEach((item, idx) => {
+                const actual = (item.weight || 0) * item.qty;
+                const vol = ((item.length || 0) * (item.width || 0) * (item.height || 0) / 4000) * item.qty;
+                const chargeable = Math.max(actual, vol);
+                totalChargeable += chargeable;
+                detailText += `📦 *Koli #${idx + 1}*: ${item.qty} pcs (${item.length}x${item.width}x${item.height} cm) -> *${chargeable.toFixed(2)} Kg*\n`;
+            });
+
+            const subtotal = totalChargeable * pricePerKg;
+            const grandTotal = usePpn ? subtotal * 1.1 : subtotal;
+
+            let text = `*RINCIAN PENAWARAN BIAYA LOGISTIK (DARAT)*\n----------------------------------------\n${detailText}----------------------------------------\n⚖️ *Total Berat Ditagihkan*: ${totalChargeable.toFixed(2)} Kg\n💵 *Tarif per Kg*: Rp ${pricePerKg.toLocaleString('id-ID')}/kg\n`;
+            if (usePpn) {
+                text += `🧾 *Subtotal*: Rp ${Math.round(subtotal).toLocaleString('id-ID')}\n➕ *PPN (10%)*: Rp ${Math.round(grandTotal - subtotal).toLocaleString('id-ID')}\n`;
             }
+            text += `💰 *TOTAL TAGIHAN*: *Rp ${Math.round(grandTotal).toLocaleString('id-ID')}*\n----------------------------------------\n_Terima kasih!_`;
 
-            const decisionCard = document.getElementById('decision_card');
-            const decisionTag = document.getElementById('decision_tag');
-            const finalWeightDisplay = document.getElementById('final_weight_display');
-            const decisionDesc = document.getElementById('decision_desc');
+            historyData.unshift({
+                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                chargeable: totalChargeable.toFixed(2),
+                total: Math.round(grandTotal).toLocaleString('id-ID')
+            });
+            if (historyData.length > 10) historyData.pop();
+            localStorage.setItem('logicalc_history', JSON.stringify(historyData));
+            renderHistory();
 
-            if (totalActualWeight === 0 && totalVolumetricWeight === 0) {
-                decisionCard.className = "rounded-xl p-4 mb-5 border transition-all duration-300 bg-slate-50 border-slate-200 shadow-sm";
-                decisionTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700";
-                decisionTag.innerText = "Belum Ada Data";
-                finalWeightDisplay.innerText = "0.00";
-                decisionDesc.innerText = "Masukkan rincian barang dan tarif per kg untuk menghitung total tagihan pengiriman.";
+            navigator.clipboard.writeText(text).then(() => alert('Tersimpan di riwayat & berhasil disalin ke WhatsApp!'));
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history_list');
+            if (!historyData.length) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-3">Belum ada riwayat tersimpan.</p>`;
                 return;
             }
-
-            decisionCard.className = "rounded-xl p-4 mb-5 border transition-all duration-300 bg-indigo-50 border-indigo-300 shadow-sm";
-            decisionTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-600 text-white shadow-sm";
-            decisionTag.innerText = "PENGIRIMAN DARAT (DIVISOR 4000)";
-            finalWeightDisplay.className = "text-3xl sm:text-4xl font-extrabold text-indigo-900";
-            finalWeightDisplay.innerText = totalChargeableWeight.toFixed(2);
-            
-            decisionDesc.innerHTML = `<i class="fa-solid fa-circle-check text-indigo-600 mr-1"></i> Total berat dasar penagihan (chargeable) adalah <strong>${totalChargeableWeight.toFixed(2)} Kg</strong>.`;
+            container.innerHTML = historyData.map(h => `
+                <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-slate-400 font-mono text-[10px]">${h.time}</span>
+                        <span class="font-semibold text-slate-700">${h.chargeable} Kg</span>
+                    </div>
+                    <span class="font-bold text-emerald-600">Rp ${h.total}</span>
+                </div>
+            `).join('');
         }
 
-        function copySummaryText() {
-            let totalQty = 0;
-            let totalActualWeight = 0;
-            let totalVolumetricWeight = 0;
-            let totalChargeableWeight = 0;
-
-            const pricePerKg = parseFloat(document.getElementById('price_per_kg').value) || 0;
-            const usePPN = document.getElementById('ppn_toggle').checked;
-            let itemDetailsText = "";
-
-            items.forEach((item, index) => {
-                const qty = item.qty > 0 ? item.qty : 1;
-                const weightPerKoli = item.weight || 0;
-                const p = item.length || 0;
-                const l = item.width || 0;
-                const t = item.height || 0;
-
-                const itemAct = qty * weightPerKoli;
-                const itemVol = ((p * l * t) / DIVISOR) * qty;
-                const itemCharge = Math.max(itemAct, itemVol);
-
-                totalQty += qty;
-                totalActualWeight += itemAct;
-                totalVolumetricWeight += itemVol;
-                totalChargeableWeight += itemCharge;
-
-                itemDetailsText += `${index + 1}. *${item.name}*\n   - Jumlah: ${qty} Koli\n   - Berat/Koli: ${weightPerKoli} kg (Aktual: ${itemAct.toFixed(2)} kg)\n   - Dimensi: ${p}x${l}x${t} cm (Vol: ${itemVol.toFixed(2)} kg)\n   - Chargeable: *${itemCharge.toFixed(2)} kg*\n`;
-            });
-
-            const subtotalBill = totalChargeableWeight * pricePerKg;
-            const finalBill = usePPN ? subtotalBill * 1.1 : subtotalBill;
-            const ppnText = usePPN ? `\n• Subtotal: ${rupiahFormat.format(subtotalBill)}\n• PPN (1.1): ${rupiahFormat.format(finalBill - subtotalBill)}` : '';
-
-            const textToCopy = 
-`📦 *RINCIAN TAGIHAN PENGIRIMAN DARAT*
-----------------------------------
-*Rincian Barang:*
-${itemDetailsText}
-----------------------------------
-*REKAPITULASI BIAYA:*
-• Total Koli: ${totalQty} Koli
-• Total Timbangan Aktual: ${totalActualWeight.toFixed(2)} Kg
-• Total Berat Volumetrik: ${totalVolumetricWeight.toFixed(2)} Kg
-• Berat Ditagihkan (Chargeable): *${totalChargeableWeight.toFixed(2)} Kg*
-• Tarif Per Kg: ${rupiahFormat.format(pricePerKg)} / Kg${ppnText}
-
-💵 *TOTAL TAGIHAN: ${rupiahFormat.format(finalBill)}* ${usePPN ? '(Inc. PPN)' : ''}
-----------------------------------
-_Dihitung via LogiCalc Darat Pro CS Tool_`;
-
-            const textarea = document.createElement('textarea');
-            textarea.value = textToCopy;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast("Rincian tagihan berhasil disalin ke WhatsApp!");
-            } catch (err) {
-                showToast("Gagal menyalin rincian tagihan.");
-            }
-            document.body.removeChild(textarea);
+        function clearHistory() {
+            historyData = [];
+            localStorage.removeItem('logicalc_history');
+            renderHistory();
         }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast_msg');
-            toastMsg.innerText = message;
-            
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        function resetAllItems() {
-            items = [];
-            nextItemId = 1;
-            document.getElementById('price_per_kg').value = '';
-            document.getElementById('ppn_toggle').checked = false;
-            addNewItem();
-            showToast("Form berhasil di-reset.");
-        }
+        renderItems();
+        renderHistory();
     </script>
 </body>
 </html>
+
+```
